@@ -1,6 +1,56 @@
+* {
+  background-color: #F3E0EC;
+}
+
 .App {
-  background-color: #FDE2FF;
   width: 100vw;
   height: 100vh;
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: start;
+}
 
+.TaskHolder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #F2BEFC;
+  width: 80%;
+  margin: 2rem;
+}
+
+.taskTitle {
+  background-color: #F2BEFC;
+  color: #F3E0EC;
+}
+
+/*
+
+Task.js stuff
+
+*/
+
+.task {
+  width: 25%;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: center;
+  border: .1rem solid #F3E0EC;
+  border-radius: 10px;
+  margin: 0 0 1rem 0;
+}
+
+.checkBox {
+  margin: 0 1rem 0 1rem;
+}
+
+.taskText {
+  background-color: transparent;
+}
+.task:hover {
+  background-color: #EAD5E6;
+  border: .1rem solid #EAD5E6;
 }
