@@ -54,3 +54,20 @@ Task.js stuff
   background-color: #EAD5E6;
   border: .1rem solid #EAD5E6;
 }
+
+/*
+
+  Nav Comp stuff
+
+*/
+
+.offcanvas-header{
+  justify-content: space-between;
+}
+
+.plusIcon {
+  transition: .15s all;
+}
+.plusIcon:hover {
+  font-size: 1.1rem;
+}
