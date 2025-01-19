@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import { useState, useRef } from 'react';
 import Task from './Components/Task/Task.js';
@@ -10,13 +9,14 @@ function App() {
   const [curProj, setCurProj] = useState(0)
   const taskValue = useRef(null)
   const [toggleModal, setToggleModal] = useState(false);
-  const [projects, setProjects] = useState([{ name: "balls", id: Date.now() }]);
+  const [workspaces, setWorkspaces] = useState([]);
   const [showOffcanvas, setShowOffcanvas] = useState(false);
+  const [projects, setProjects] = useState([]);
   
   return (
     <div className="App">
-      <ModalInput setToggleModal={setToggleModal} toggleModal={toggleModal} projects={projects} setProjects={setProjects} setShowOffcanvas={setShowOffcanvas} />
-      <NavbarComp setCurProj={setCurProj} setToggleModal={setToggleModal} projects={projects} show={showOffcanvas} setShow={setShowOffcanvas} />
+      <ModalInput setToggleModal={setToggleModal} toggleModal={toggleModal} workspaces={workspaces} setWorkspaces={setWorkspaces} setShowOffcanvas={setShowOffcanvas} />
+      <NavbarComp setCurProj={setCurProj} setToggleModal={setToggleModal} workspaces={workspaces} show={showOffcanvas} setShow={setShowOffcanvas} projects={projects} />
       <TaskHolder setTasks={setTasks} tasks={tasks}  />
       <div className="textInput">
         <form onSubmit={(e) => {

@@ -71,3 +71,46 @@ Task.js stuff
 .plusIcon:hover {
   font-size: 1.1rem;
 }
+
+#dropdown-basic-button {
+  width: 100%;
+  text-align: left;
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Specifically Dropdown stuff */
+
+.dropdown-header-holder {
+  padding: 1rem;
+  border: .1rem solid #EAD5E6;
+  border-radius: 10px;
+}
+
+.dropdown-header-favicons {
+  background-color: transparent;
+}
+
+.dropdown-header-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: transparent;
+}
+.ddHeaderPlus {
+  padding: 0 1rem 0 1rem;
+  background-color: transparent;
+}
+.ddHeaderCaret {
+  background-color: transparent;
+  transition: 1s all;
+}
+.dropdown-header-text {
+  background-color: transparent;
+}
+
+.dropdown-header-holder:hover {
+  background-color: #EAD5E6;
+}

@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react'
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 
-function ModalInput({ setToggleModal, toggleModal, projects, setProjects, setShowOffcanvas}) {
-    const projectValue = useRef(null);
+function ModalInput({ setToggleModal, toggleModal, workspaces, setWorkspaces, setShowOffcanvas}) {
+    const workspaceValue = useRef(null);
     const handleClose = () => setToggleModal(false);
 
   return (
@@ -29,18 +29,18 @@ function ModalInput({ setToggleModal, toggleModal, projects, setProjects, setSho
         </p>
         <form onSubmit={(e)=> {
             e.preventDefault();
-            setProjects([...projects, { name: projectValue.current.value, id: Date.now()}]);
+            setWorkspaces([...workspaces, { name: workspaceValue.current.value, id: Date.now(), projects: []}]);
             handleClose();
             setShowOffcanvas(true);
         }}>
-            <h5>Project Name:</h5>
-            <input type="text" ref={projectValue} ></input>
+            <h5>Workspace Name:</h5>
+            <input type="text" ref={workspaceValue} ></input>
         </form>
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={handleClose}>Close</Button>
         <Button onClick={() => {
-            setProjects([...projects, { name: projectValue.current.value, id: Date.now()}]);
+            setWorkspaces([...workspaces, { name: workspaceValue.current.value, id: Date.now(), projects: []}]);
             handleClose();
             setShowOffcanvas(true);
         }}>Add</Button>

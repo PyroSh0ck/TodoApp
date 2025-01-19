@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import DropdownComp from '../DropdownComp/DropdownComp.js';
 
 
 
-function NavbarComp({ setCurProj, setToggleModal, projects, show, setShow }) { 
+function NavbarComp({ setCurProj, setToggleModal, workspaces, show, setShow, projects }) { 
 
     /* 
         I want projects to have a specific ID, so that whenever you click on them,
@@ -18,7 +19,10 @@ function NavbarComp({ setCurProj, setToggleModal, projects, show, setShow }) {
 
         Each project will look like this:
 
-        { name : "[INSERT PROJECT NAME HERE]", id: Date.now()}
+        { name : "[INSERT PROJECT NAME HERE]", id: Date.now(), workspace : some number (thats the workspace id)}
+
+        Correction, I'll have the entire list of projects in the data for the workspace. That's easier than looping through all of them
+        and then performing an operationt to check and see 
     */
 
     const handleClose = () => setShow(false);
@@ -36,13 +40,14 @@ function NavbarComp({ setCurProj, setToggleModal, projects, show, setShow }) {
 
             <Offcanvas show={show} onHide={handleClose}>
                 <Offcanvas.Header closeButton={false}>
-                    <Offcanvas.Title> Projects </Offcanvas.Title>
+                    <Offcanvas.Title> Workspaces </Offcanvas.Title>
                     <FontAwesomeIcon icon={faPlus} className="plusIcon" onClick={handleAdd}></FontAwesomeIcon>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    {projects.map((data, index) => <h1 key={index} className="project" onClick={() => {
-                        setCurProj(data.id)
-                    }}>{data.name}</h1>)}
+                    {console.log(workspaces)}
+                    {workspaces.map((wdata, windex) => (
+                       <DropdownComp wdata={wdata} windex={windex} />
+                    ))}
                 </Offcanvas.Body>
             </Offcanvas>
         </>
