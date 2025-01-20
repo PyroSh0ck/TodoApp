@@ -1,15 +1,28 @@
-import React, { useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import DropdownComp from '../DropdownComp/DropdownComp.js';
+import React, { useState } from "react";
+import Button from "react-bootstrap/Button";
+import Offcanvas from "react-bootstrap/Offcanvas";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faBars } from "@fortawesome/free-solid-svg-icons";
+import DropdownComp from "../DropdownComp/DropdownComp.js";
+import { useBaseContexts } from "../../Context/BaseContexts.js";
+import styled from "styled-components";
 
+const Bars = styled(FontAwesomeIcon)`
+  visibility: ${({ $show }) => {
+    if ($show) {
+      return `visible;`;
+    } else {
+      return `hidden;`;
+    }
+  }};
 
+  padding: 3rem 3rem 3rem 3rem;
+  font-size: 2rem;
+  color: #f2befc;
+`;
 
-function NavbarComp({ setCurProj, setToggleModal, workspaces, show, setShow, projects }) { 
-
-    /* 
+function NavbarComp() {
+  /* 
         I want projects to have a specific ID, so that whenever you click on them,
         the application filters all of the tasks by project. And whenever you have 
         a certain project selected, any task added gets added to that project. 
@@ -25,33 +38,51 @@ function NavbarComp({ setCurProj, setToggleModal, workspaces, show, setShow, pro
         and then performing an operationt to check and see 
     */
 
-    const handleClose = () => setShow(false);
-    const handleOpen = () => setShow(true); 
-    const handleAdd = () => {
-        setShow(false);
-        setToggleModal(true);
-    }
+  const { toggleModal, modalType, showOffcanvas, workspaces } =
+    useBaseContexts();
+  const [toggleModalVal, setToggleModalVal] = toggleModal;
+  const [modalTypeVal, setModalTypeVal] = modalType;
+  const [showOffcanvasVal, setShowOffcanvasVal] = showOffcanvas;
+  const [workspacesVal, setWorkspacesVal] = workspaces;
 
-    return (
-        <>
-            <Button variant="primary" onClick={handleOpen}>
-                Launch
-            </Button>
+  const handleClose = () => setShowOffcanvasVal(false);
+  const handleOpen = () => setShowOffcanvasVal(true);
+  const handleAdd = () => {
+    setShowOffcanvasVal(false);
+    setToggleModalVal(true);
+    setModalTypeVal("addWorkspace");
+  };
 
-            <Offcanvas show={show} onHide={handleClose}>
-                <Offcanvas.Header closeButton={false}>
-                    <Offcanvas.Title> Workspaces </Offcanvas.Title>
-                    <FontAwesomeIcon icon={faPlus} className="plusIcon" onClick={handleAdd}></FontAwesomeIcon>
-                </Offcanvas.Header>
-                <Offcanvas.Body>
-                    {console.log(workspaces)}
-                    {workspaces.map((wdata, windex) => (
-                       <DropdownComp wdata={wdata} windex={windex} />
-                    ))}
-                </Offcanvas.Body>
-            </Offcanvas>
-        </>
-  )
+  return (
+    <>
+      <Bars icon={faBars} onClick={handleOpen} $show={!showOffcanvasVal} />
+
+      <Offcanvas show={showOffcanvasVal} onHide={handleClose}>
+        <Offcanvas.Header closeButton={false}>
+          <Offcanvas.Title> Workspaces </Offcanvas.Title>
+          <FontAwesomeIcon
+            icon={faPlus}
+            className="plusIcon"
+            onClick={handleAdd}
+          ></FontAwesomeIcon>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          {workspacesVal.map((wdata, windex) => (
+            <DropdownComp
+              key={windex}
+              Dtitle={wdata.name || undefined}
+              Did={wdata.id || undefined}
+              Ddata={wdata.projects || -99}
+              Dmodifiers={{
+                includePlus: true,
+                workspaceName: wdata.name || undefined,
+              }}
+            />
+          ))}
+        </Offcanvas.Body>
+      </Offcanvas>
+    </>
+  );
 }
 
-export default NavbarComp
+export default NavbarComp;

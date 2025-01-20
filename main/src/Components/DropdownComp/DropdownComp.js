@@ -1,33 +1,197 @@
-import React, { useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import styled from "styled-components";
+import DropdownMenuItem from "./DropdownMenuItem/DropdownMenuItem";
+import { useBaseContexts } from "../../Context/BaseContexts";
 
-function DropdownComp({ wdata, windex }) {
-    const [caretRotation, setCaretRotation] = useState(270);
-    const [toggled, setToggled] = useState(false)
-
-    const dropdownHandler = () => {
-        if (toggled) {
-            setCaretRotation(0);
-            setToggled(false);
-        } else {
-            setCaretRotation(270);
-            setToggled(true);
-        }
+const DropdownText = styled.h5`
+  background-color: transparent;
+  padding: 0rem;
+  margin: 0rem;
+`;
+const CDropdown = styled.div`
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+`;
+const CDropdownTitleDiv = styled(CDropdown)`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
+  &:hover {
+    background-color: #ead5e6;
+  }
+  border: 0.2rem solid #ead5e6;
+  border-radius: 10px;
+  padding: 0.5rem 1rem 0.5rem 1rem;
+`;
+const FaviconHolder = styled.div`
+  background-color: transparent;
+`;
+const Icon = styled(FontAwesomeIcon)`
+  background-color: transparent;
+  transition: 0.3s all;
+`;
+const Plus = styled(Icon)`
+    visibility: ${({ $includePlus }) => {
+      if ($includePlus) {
+        return `visible;`;
+      } else {
+        return `hidden;`;
+      }
+    }}
+    &:hover {
+      font-size: 1.1rem;
     }
-    return (
-        <div key={windex} className="dropdown-holder">
-            <div className="dropdown-header-holder" onClick={dropdownHandler}>
-                <div className="dropdown-header-div">
-                    <h5 className="dropdown-header-text"> {wdata.name} </h5>
-                    <div className="dropdown-header-favicons">
-                        <FontAwesomeIcon icon={faPlus} className="ddHeaderPlus"></FontAwesomeIcon>
-                        <FontAwesomeIcon icon={faCaretDown} className={`ddHeaderCaret fa-rotate-${caretRotation}`} ></FontAwesomeIcon>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
+    padding: 0 .5rem 0 .5rem;
+`;
+const Caret = styled(Icon)`
+  transform: ${({ $rotation }) => `rotate(${$rotation}deg)`};
+`;
+const DropdownBody = styled.div`
+  overflow-x: scroll;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  background-color: #ead5e6;
+  border: 0.2rem solid #ead5e6;
+  border-radius: 10px;
+
+  max-height: ${({ $toggled }) => {
+    if ($toggled) {
+      return `10rem;`;
+    } else {
+      return `0px;`;
+    }
+  }}
+
+  visibility: ${({ $toggled }) => {
+    if ($toggled) {
+      return `visible;`;
+    } else {
+      return `hidden;`;
+    }
+  }}
+  
+  opacity: ${({ $toggled }) => {
+    if ($toggled) {
+      return `100%;`;
+    } else {
+      return `0%;`;
+    }
+  }}
+
+  transition: .3s opacity;
+`;
+
+function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
+  // Title should be self-explanatory, its just going to be a string
+  // Data is an array that contains all the stuff I want it to contain
+  // Modifiers is an object that contains some modifiers. If I do not
+  // want said modifiers, I shall modify the modifiers accordingly
+
+  /*
+        Data should be in this format:
+        data = [
+            {item 1}, {item 2}, ...
+        ]
+        
+        and
+
+        Modifiers should be in this format:
+        modifiers = {
+            includePlus: true
+        }
+    */
+
+  /*
+        Format for the dropdown menu
+        <main div that holds everything> - dropdownwrapper
+            <div that holds the title and stuff> -dropdownTitleWrapper
+                <div that holds the text for title>
+                <div that holds the favicons>
+                    <favicon dropdown>
+                    <plus icon (optional)>
+            <div that drops down>
+  */
+
+  const [caretRotation, setCaretRotation] = useState(-90);
+  const [toggled, setToggled] = useState(false);
+
+  const { workspace, modalType, toggleModal } = useBaseContexts();
+
+  const [workspaceVal, setWorkspaceVal] = workspace;
+  const [modalTypeVal, setModalTypeVal] = modalType;
+  const [toggleModalVal, setToggleModalVal] = toggleModal;
+
+  if (Dmodifiers == undefined) {
+    Dmodifiers = {
+      includePlus: true,
+    };
+  }
+
+  if (Dtitle == undefined) {
+    Dtitle = "";
+  }
+
+  if (Ddata == undefined || Ddata == []) {
+    Ddata = [
+      {
+        name: "",
+        id: 0,
+      },
+    ];
+  }
+
+  /* Functions */
+
+  const projectAddHandler = () => {
+    console.log(Ddata);
+    setWorkspaceVal(Did);
+    setModalTypeVal("addProject");
+    setToggleModalVal(true);
+
+    // console.log(workspaceVal, modalTypeVal, toggleModalVal);
+  };
+
+  const dropdownHandler = () => {
+    if (toggled) {
+      setCaretRotation(-90);
+    } else {
+      setCaretRotation(0);
+    }
+    setToggled(!toggled);
+  };
+  return (
+    <CDropdown>
+      <CDropdownTitleDiv onClick={dropdownHandler}>
+        <DropdownText>{Dtitle}</DropdownText>
+        <FaviconHolder>
+          <Plus
+            $includePlus={Dmodifiers.includePlus}
+            icon={faPlus}
+            onClick={projectAddHandler}
+          />
+          <Caret icon={faCaretDown} $rotation={caretRotation} />
+        </FaviconHolder>
+      </CDropdownTitleDiv>
+      <DropdownBody $toggled={toggled}>
+        {Ddata.map((subData, subIndex) => (
+          <DropdownMenuItem
+            name={subData.name}
+            key={subIndex}
+            id={subData.id}
+          />
+        ))}
+      </DropdownBody>
+    </CDropdown>
+  );
 }
 
-export default DropdownComp
+export default DropdownComp;
