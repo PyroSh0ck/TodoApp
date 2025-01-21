@@ -11,14 +11,11 @@ const MenuItem = styled.div`
   }
 `;
 
-function DropdownMenuItem({ name, id }) {
+function DropdownMenuItem({ name, id, passedClickFunc }) {
   const baseVals = useBaseContexts();
 
   const [project, setProject] = baseVals.project;
 
-  const clickHandler = () => {
-    setProject(id);
-  };
   if (name == "") {
     return (
       <MenuItem>
@@ -26,7 +23,16 @@ function DropdownMenuItem({ name, id }) {
       </MenuItem>
     );
   } else {
-    return <MenuItem onClick={clickHandler}>{name}</MenuItem>;
+    return (
+      <MenuItem
+        className="click here bruh"
+        onClick={(e) => {
+          passedClickFunc(e, name, id);
+        }}
+      >
+        {name}
+      </MenuItem>
+    );
   }
 }
 

@@ -1,57 +1,16 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import DropdownMenuItem from "./DropdownMenuItem/DropdownMenuItem";
 import { useBaseContexts } from "../../Context/BaseContexts";
 
-const DropdownText = styled.h5`
-  background-color: transparent;
-  padding: 0rem;
-  margin: 0rem;
-`;
 const CDropdown = styled.div`
   background-color: transparent;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   width: 100%;
-`;
-const CDropdownTitleDiv = styled(CDropdown)`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  background-color: transparent;
-  &:hover {
-    background-color: #ead5e6;
-  }
-  border: 0.2rem solid #ead5e6;
-  border-radius: 10px;
-  padding: 0.5rem 1rem 0.5rem 1rem;
-`;
-const FaviconHolder = styled.div`
-  background-color: transparent;
-`;
-const Icon = styled(FontAwesomeIcon)`
-  background-color: transparent;
-  transition: 0.3s all;
-`;
-const Plus = styled(Icon)`
-    visibility: ${({ $includePlus }) => {
-      if ($includePlus) {
-        return `visible;`;
-      } else {
-        return `hidden;`;
-      }
-    }}
-    &:hover {
-      font-size: 1.1rem;
-    }
-    padding: 0 .5rem 0 .5rem;
-`;
-const Caret = styled(Icon)`
-  transform: ${({ $rotation }) => `rotate(${$rotation}deg)`};
 `;
 const DropdownBody = styled.div`
   overflow-x: scroll;
@@ -89,7 +48,47 @@ const DropdownBody = styled.div`
 
   transition: .3s opacity;
 `;
-
+const DropdownText = styled.h5`
+  background-color: transparent;
+  padding: 0rem;
+  margin: 0rem;
+`;
+const FaviconHolder = styled.div`
+  background-color: transparent;
+`;
+const Icon = styled(FontAwesomeIcon)`
+  background-color: transparent;
+  transition: 0.3s all;
+`;
+const Plus = styled(Icon)`
+    visibility: ${({ $includePlus }) => {
+      if ($includePlus) {
+        return `visible;`;
+      } else {
+        return `hidden;`;
+      }
+    }}
+    &:hover {
+      font-size: 1.1rem;
+    }
+    padding: 0 .5rem 0 .5rem;
+`;
+const Caret = styled(Icon)`
+  transform: ${({ $rotation }) => `rotate(${$rotation}deg)`};
+`;
+const CDropdownTitleDiv = styled(CDropdown)`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
+  &:hover {
+    background-color: #ead5e6;
+  }
+  border: 0.2rem solid #ead5e6;
+  border-radius: 10px;
+  padding: 0.5rem 1rem 0.5rem 1rem;
+`;
 function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
   // Title should be self-explanatory, its just going to be a string
   // Data is an array that contains all the stuff I want it to contain
@@ -123,24 +122,25 @@ function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
 
   const [caretRotation, setCaretRotation] = useState(-90);
   const [toggled, setToggled] = useState(false);
+  const [ddText, setddText] = useState(undefined);
 
-  const { workspace, modalType, toggleModal } = useBaseContexts();
+  const baseVals = useBaseContexts();
 
-  const [workspaceVal, setWorkspaceVal] = workspace;
-  const [modalTypeVal, setModalTypeVal] = modalType;
-  const [toggleModalVal, setToggleModalVal] = toggleModal;
+  const [wptInfo, setWptInfo] = baseVals.wptInfo;
+  const [modalArgs, setModalArgs] = baseVals.modalArgs;
+  const [selected, setSelected] = baseVals.selected;
 
-  if (Dmodifiers == undefined) {
+  if (Dmodifiers === undefined) {
     Dmodifiers = {
       includePlus: true,
     };
   }
 
-  if (Dtitle == undefined) {
+  if (Dtitle === undefined) {
     Dtitle = "";
   }
 
-  if (Ddata == undefined || Ddata == []) {
+  if (Ddata === undefined || Ddata == []) {
     Ddata = [
       {
         name: "",
@@ -149,15 +149,61 @@ function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
     ];
   }
 
+  if (ddText === undefined) {
+    setddText(Dtitle);
+    setToggled(false);
+  }
+
   /* Functions */
 
   const projectAddHandler = () => {
-    console.log(Ddata);
-    setWorkspaceVal(Did);
-    setModalTypeVal("addProject");
-    setToggleModalVal(true);
+    setSelected({
+      ...selected,
+      workspace: {
+        ...selected.workspace,
+        id: Did,
+        // I could search through the workspaces to find the attrs of the workspace with the same id as we're given
+        // However, this is unnecessary, and I think that if I ever do need to access that,
+        // Then I will look to see if the name is an empty string, then search when I need to
+        // This will probably save on computation time?
+      },
+    });
 
-    // console.log(workspaceVal, modalTypeVal, toggleModalVal);
+    setModalArgs({
+      toggled: true,
+      type: "project",
+      modalInfo: {
+        heading: "Add a new Project!",
+        inputTitle: "Project Name:",
+        secondInput: false,
+        secondTitle: "",
+        showDate: false,
+      },
+    });
+  };
+
+  const menuHandler = (e, sname, sid) => {
+    console.log("button pressed? Maybe wrong button");
+    if (modalArgs.type === "project") {
+      setSelected({
+        ...selected,
+        workspace: {
+          ...selected.workspace,
+          id: sid,
+        },
+      });
+    } else if (modalArgs.type === "task") {
+      setSelected({
+        ...selected,
+        project: {
+          ...selected.project,
+          id: sid,
+        },
+      });
+      console.log(sid);
+      setddText(sname);
+      setToggled(false);
+    }
   };
 
   const dropdownHandler = () => {
@@ -171,7 +217,7 @@ function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
   return (
     <CDropdown>
       <CDropdownTitleDiv onClick={dropdownHandler}>
-        <DropdownText>{Dtitle}</DropdownText>
+        <DropdownText>{ddText}</DropdownText>
         <FaviconHolder>
           <Plus
             $includePlus={Dmodifiers.includePlus}
@@ -187,6 +233,7 @@ function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
             name={subData.name}
             key={subIndex}
             id={subData.id}
+            passedClickFunc={menuHandler}
           />
         ))}
       </DropdownBody>
