@@ -3,7 +3,7 @@ import { useState } from "react";
 import Task from "./Components/Task/Task.js";
 import NavbarComp from "./Components/NavbarComp/NavbarComp.js";
 import ModalInput from "./Components/ModalInput/ModalInput.js";
-import { BaseContexts } from "./Context/BaseContexts.js";
+import { BaseContexts, useBaseContexts } from "./Context/BaseContexts.js";
 import styled from "styled-components";
 import Button from "react-bootstrap/Button";
 
@@ -16,6 +16,33 @@ const AppDiv = styled.div`
   align-items: flex-start;
 `;
 
+const ModifiedTaskHolder = styled.div`
+  background-color: #f2befc;
+  padding: 0.5rem;
+  border: 0.1rem solid #f2befc;
+  border-radius: 10px;
+  width: 35%;
+  margin: 2rem;
+`;
+
+const TextCompHolder = styled.div`
+  padding: 1rem;
+  margin: 2rem 0 0 0;
+`;
+
+const ModifiedButton = styled(Button)`
+  background-color: #f2befc;
+  border-color: #f2befc;
+  color: black;
+
+  transition: 0.3s font-size;
+
+  &:hover {
+    font-size: 1.1rem;
+    background-color: #f2befc;
+    border-color: #f2befc;
+  }
+`;
 const MenuDiv = styled.div`
   width: 10%;
   display: flex;
@@ -65,17 +92,31 @@ function App() {
   });
 
   const clickHandler = () => {
-    setModalArgs({
-      toggled: true,
-      type: "task",
-      modalInfo: {
-        heading: "Add a new Task!",
-        inputTitle: "Task Name:",
-        secondInput: true,
-        secondTitle: "Please select a project:",
-        dateInput: true,
-      },
-    });
+    if (selected.project.id !== 0) {
+      setModalArgs({
+        toggled: true,
+        type: "task",
+        modalInfo: {
+          heading: "Add a new Task!",
+          inputTitle: "Task Name:",
+          secondInput: false,
+          secondTitle: "",
+          dateInput: true,
+        },
+      });
+    } else {
+      setModalArgs({
+        toggled: true,
+        type: "task",
+        modalInfo: {
+          heading: "Add a new Task!",
+          inputTitle: "Task Name:",
+          secondInput: true,
+          secondTitle: "Please select a project:",
+          dateInput: true,
+        },
+      });
+    }
   };
   return (
     <AppDiv>
@@ -92,20 +133,30 @@ function App() {
         </MenuDiv>
         <MainDiv>
           <ModalInput />
-          <TaskHolder tasks={wptInfo.tasks} project={selected.project} />
-          <Button onClick={clickHandler}>Add Task</Button>
+          <TextCompHolder>
+            <TextHolder />
+          </TextCompHolder>
+          <ModifiedButton onClick={clickHandler}>Add Task</ModifiedButton>
+          <ModifiedTaskHolder>
+            <TaskHolder />
+          </ModifiedTaskHolder>
         </MainDiv>
       </BaseContexts.Provider>
     </AppDiv>
   );
 }
 
-function TaskHolder({ tasks, project }) {
+function TaskHolder() {
   // Selected in this case refers to the current project. It has all the information necessary
   // to construct anything about the project, but if the project id is 0, we know that
   // there is no project selected.
 
   /* This snippet of code just handles all edge cases (I think, cuz I always forget these. But for my future reference, I tried to cover all edge cases here) */
+
+  const baseVals = useBaseContexts();
+
+  const project = baseVals.selected[0].project;
+  const tasks = baseVals.wptInfo[0].tasks;
 
   if (project === null || project === undefined) {
     throw new Error(
@@ -123,34 +174,75 @@ function TaskHolder({ tasks, project }) {
 
   // To practice DRY, I'll create a lil function since my if statement logic is basically the same
 
-  const conditionalReturner = ({ condition, task, index }) => {
+  const conditionalReturner = (condition, task, index) => {
     if (condition) {
-      return <Task name={task.name} key={index} id={task.id} />;
+      return (
+        <Task
+          name={task.name}
+          timeInfo={task.time}
+          key={index}
+          category={task.category}
+          id={task.id}
+        />
+      );
     } else {
       return null;
     }
   };
 
+  // Now a useEffect to track whenever the state of project changes!
+
   try {
+    let renderedComponent;
     if (project.id === 0) {
+      console.log("project id = 0");
       // So if there is no current project selected, then we display all tasks
-      tasks.map((task, index) => {
-        return conditionalReturner(task !== null, task, index);
+      renderedComponent = tasks.map((task, index) => {
+        if (task !== null) {
+          return conditionalReturner(true, task, index);
+        } else {
+          return conditionalReturner(false, task, index);
+        }
       });
       // First check to make sure task isn't null (if there aren't any tasks and the tasks arr is empty)
     } else {
-      tasks.map((task, index) => {
+      console.log("Project id is not 0");
+      renderedComponent = tasks.map((task, index) => {
         if (task !== null) {
-          return conditionalReturner(task.id === project.id, task, index);
+          if (task.category === project.id) {
+            return conditionalReturner(true, task, index);
+          } else {
+            return conditionalReturner(false, task, index);
+          }
         } else {
           return null;
         }
         // Wish I could have looped the conditoinalreturner function but alas I couldn't!
       });
     }
+    return renderedComponent;
   } catch (err) {
     console.error(err);
   }
 }
 
+function TextHolder() {
+  const baseVals = useBaseContexts();
+
+  const selected = baseVals.selected[0];
+  const wptInfo = baseVals.wptInfo[0];
+
+  if (selected.project.id !== 0) {
+    let pname = "";
+    wptInfo.projects.map((p) => {
+      if (p.id === selected.project.id) {
+        pname = p.name;
+      }
+      return null;
+    });
+    return <h1>{pname}'s Tasks!</h1>;
+  } else {
+    return <h1>Today's Tasks!</h1>;
+  }
+}
 export default App;

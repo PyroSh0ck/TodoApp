@@ -13,7 +13,7 @@ function ModalInput() {
   const [modalArgs, setModalArgs] = baseVals.modalArgs;
   const [wptInfo, setWptInfo] = baseVals.wptInfo;
   const [selected, setSelected] = baseVals.selected;
-  const [toggleCanvas, setToggleCanvas] = baseVals.toggleCanvas;
+  const setToggleCanvas = baseVals.toggleCanvas[1];
 
   const handleClose = () =>
     setModalArgs({
@@ -22,6 +22,7 @@ function ModalInput() {
       // js chooses the second key value to keep (as its basically the most recent addition)
       // therefore it will update only the toggled value
       ...modalArgs,
+      type: "",
       toggled: false,
     });
   const handleAdd = () => {
@@ -58,7 +59,7 @@ function ModalInput() {
           id: 0,
         },
       });
-    } else if (modalArgs.type === "addTask") {
+    } else if (modalArgs.type === "task") {
       if (selected.project.id !== 0) {
         setWptInfo({
           ...wptInfo,
@@ -77,14 +78,15 @@ function ModalInput() {
           "Hey, your project has the default value, it doesn't seem like you chose a project for this task!"
         );
       }
-      setSelected({
-        ...selected,
-        project: {
-          name: "",
-          id: 0,
-          category: 0,
-        },
-      });
+      // setSelected({
+      //   ...selected,
+      //   project: {
+      //     name: "",
+      //     id: 0,
+      //     category: 0,
+      //   },
+      // });
+      // If code broken add this back?
     }
     handleClose();
     setToggleCanvas(true);
@@ -120,11 +122,11 @@ function ModalInput() {
             <h5>{modalArgs.modalInfo.inputTitle}</h5>
             <input type="text" ref={workspaceValue}></input>
           </div>
-          <ModalSecondTitle modalInfo={modalArgs.modalInfo} />
+          <ModalSecondTitle />
           <ModalThirdTitle
-            showDate={modalArgs.modalInfo.showDate}
+            showDate={modalArgs.modalInfo.dateInput}
             dateValue={dateValue}
-          ></ModalThirdTitle>
+          />
         </form>
       </Modal.Body>
       <Modal.Footer>
@@ -135,45 +137,52 @@ function ModalInput() {
   );
 }
 
-function ModalSecondTitle({ modalInfo }) {
+function ModalSecondTitle() {
   const baseVals = useBaseContexts();
-  const [wptInfo, setWptInfo] = baseVals.wptInfo;
+  const wptInfo = baseVals.wptInfo[0];
+  const modalArgs = baseVals.modalArgs[0];
 
   // I am not going to add the functionality for adding a project without clicking on a workspace first just yet.
 
-  if (modalInfo.secondInput === true) {
+  if (modalArgs.modalInfo.secondInput === true) {
     // I won't have to worry about checking to make sure that the selected workspace/project isn't null
     // because whenever I do implement a button that can add a task/project to any workspace
     // I will send over a secondInput = false;
-    if (modalInfo.type === "project") {
+    if (modalArgs.type === "project") {
       return (
         <>
-          <h5>{modalInfo.secondTitle}</h5>
+          <h5>{modalArgs.modalInfo.secondTitle}</h5>
           <DropdownComp
             Dtitle="Select Workspace: "
             Ddata={wptInfo.workspaces}
             Did={-1}
             Dmodifiers={{
               includePlus: false,
+              replaceTitle: true,
             }}
           />
         </>
       );
-    } else if (modalInfo.type === "task") {
+    } else if (modalArgs.type === "task") {
       return (
         <>
-          <h5>{modalInfo.secondTitle}</h5>
+          <h5>{modalArgs.modalInfo.secondTitle}</h5>
           <DropdownComp
             Dtitle="Select Project: "
             Ddata={wptInfo.projects}
             Did={-2}
             Dmodifiers={{
               includePlus: false,
+              replaceTitle: true,
             }}
           />
         </>
       );
+    } else {
+      return null;
     }
+  } else {
+    return null;
   }
 }
 

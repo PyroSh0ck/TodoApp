@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import { useBaseContexts } from "../../../Context/BaseContexts";
 
 const MenuItem = styled.div`
   background-color: #ead5e6;
@@ -12,10 +11,6 @@ const MenuItem = styled.div`
 `;
 
 function DropdownMenuItem({ name, id, passedClickFunc }) {
-  const baseVals = useBaseContexts();
-
-  const [project, setProject] = baseVals.project;
-
   if (name == "") {
     return (
       <MenuItem>

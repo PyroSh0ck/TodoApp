@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
@@ -125,14 +125,14 @@ function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
   const [ddText, setddText] = useState(undefined);
 
   const baseVals = useBaseContexts();
-
-  const [wptInfo, setWptInfo] = baseVals.wptInfo;
   const [modalArgs, setModalArgs] = baseVals.modalArgs;
   const [selected, setSelected] = baseVals.selected;
+  const toggleCanvas = baseVals.toggleCanvas[0];
 
   if (Dmodifiers === undefined) {
     Dmodifiers = {
       includePlus: true,
+      replaceTitle: true,
     };
   }
 
@@ -140,7 +140,7 @@ function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
     Dtitle = "";
   }
 
-  if (Ddata === undefined || Ddata == []) {
+  if (Ddata === undefined || Ddata.temp === null) {
     Ddata = [
       {
         name: "",
@@ -183,7 +183,6 @@ function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
   };
 
   const menuHandler = (e, sname, sid) => {
-    console.log("button pressed? Maybe wrong button");
     if (modalArgs.type === "project") {
       setSelected({
         ...selected,
@@ -192,7 +191,7 @@ function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
           id: sid,
         },
       });
-    } else if (modalArgs.type === "task") {
+    } else if (modalArgs.type === "task" || toggleCanvas === true) {
       setSelected({
         ...selected,
         project: {
@@ -200,10 +199,12 @@ function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
           id: sid,
         },
       });
-      console.log(sid);
-      setddText(sname);
-      setToggled(false);
     }
+    if (Dmodifiers.replaceTitle) {
+      setddText(sname);
+    }
+    setToggled(false);
+    setCaretRotation(-90);
   };
 
   const dropdownHandler = () => {
@@ -228,14 +229,20 @@ function DropdownComp({ Dtitle, Did, Ddata, Dmodifiers }) {
         </FaviconHolder>
       </CDropdownTitleDiv>
       <DropdownBody $toggled={toggled}>
-        {Ddata.map((subData, subIndex) => (
-          <DropdownMenuItem
-            name={subData.name}
-            key={subIndex}
-            id={subData.id}
-            passedClickFunc={menuHandler}
-          />
-        ))}
+        {Ddata.map((subData, subIndex) => {
+          if (subData !== null) {
+            return (
+              <DropdownMenuItem
+                name={subData.name}
+                key={subIndex}
+                id={subData.id}
+                passedClickFunc={menuHandler}
+              />
+            );
+          } else {
+            return null;
+          }
+        })}
       </DropdownBody>
     </CDropdown>
   );
